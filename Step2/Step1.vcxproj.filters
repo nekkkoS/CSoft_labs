@@ -24,7 +24,7 @@
     <ClCompile Include="acrxEntryPoint.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="Step2.cpp">
+    <ClCompile Include="Step1.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>
