@@ -60,12 +60,12 @@ BEGIN
 		BLOCK "040904B0"
 		BEGIN
 			VALUE "CompanyName", "\0"
-			VALUE "FileDescription", "Step1 ObjectARX application\0"
+			VALUE "FileDescription", "Step2 ObjectARX application\0"
 			VALUE "FileVersion", "1, 0, 0, 1\0"
-			VALUE "InternalName", "Step1\0"
+			VALUE "InternalName", "Step2\0"
 			VALUE "LegalCopyright", "Copyright © 2012\0"
-			VALUE "OriginalFilename", "ADSKStep1.arx\0"
-			VALUE "ProductName", "Step1 Application\0"
+			VALUE "OriginalFilename", "ADSKStep2.arx\0"
+			VALUE "ProductName", "Step2 Application\0"
 			VALUE "ProductVersion", "1, 0, 0, 1\0"
 		END
 	END
@@ -84,7 +84,7 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-	IDS_PROJNAME					"Step1"
+	IDS_PROJNAME					"Step2"
 END
 
 

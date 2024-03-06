@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by Step1.rc
+// Used by Step2.rc
 //
 #define IDS_PROJNAME 100
 

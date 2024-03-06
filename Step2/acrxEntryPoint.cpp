@@ -1,8 +1,6 @@
-
 #include "StdAfx.h"
 #include "resource.h"
 #include <tchar.h>
-#include <iostream>
 
 //-----------------------------------------------------------------------------
 #define szRDS _RXST("ADSK")
@@ -12,33 +10,33 @@
 class CStep2App : public AcRxArxApp {
 
 public:
-	CStep2App() : AcRxArxApp() {}
+	CStep2App () : AcRxArxApp () {}
 
-	virtual AcRx::AppRetCode On_kInitAppMsg(void* pkt) {
+	virtual AcRx::AppRetCode On_kInitAppMsg (void *pkt) {
 		// TODO: Load dependencies here
 
 		// You *must* call On_kInitAppMsg here
-		AcRx::AppRetCode retCode = AcRxArxApp::On_kInitAppMsg(pkt);
-
+		AcRx::AppRetCode retCode =AcRxArxApp::On_kInitAppMsg (pkt) ;
+		
 		// TODO: Add your initialization code here
 
-		return (retCode);
+		return (retCode) ;
 	}
 
-	virtual AcRx::AppRetCode On_kUnloadAppMsg(void* pkt) {
+	virtual AcRx::AppRetCode On_kUnloadAppMsg (void *pkt) {
 		// TODO: Add your code here
 
 		// You *must* call On_kUnloadAppMsg here
-		AcRx::AppRetCode retCode = AcRxArxApp::On_kUnloadAppMsg(pkt);
+		AcRx::AppRetCode retCode =AcRxArxApp::On_kUnloadAppMsg (pkt) ;
 
 		// TODO: Unload dependencies here
 
-		return (retCode);
+		return (retCode) ;
 	}
 
-	virtual void RegisterServerComponents() {
+	virtual void RegisterServerComponents () {
 	}
-
+	
 	static void AsdkStep2_requestPoint() {
 		ads_point point;
 		if (acedGetPoint(NULL, _T("Select a point: "), point) == RTNORM) {
@@ -130,15 +128,16 @@ public:
 	//	pBtblRcd->close();
 	//	delete pBlkTblRcdItr;
 	//}
-
-};
+	
+} ;
 
 //-----------------------------------------------------------------------------
 IMPLEMENT_ARX_ENTRYPOINT(CStep2App)
-
 ACED_ARXCOMMAND_ENTRY_AUTO(CStep2App, AsdkStep2, _requestPoint, requestPoint, ACRX_CMD_TRANSPARENT, NULL);
 ACED_ARXCOMMAND_ENTRY_AUTO(CStep2App, AsdkStep2, _requestAngle, requestAngle, ACRX_CMD_TRANSPARENT, NULL);
 ACED_ARXCOMMAND_ENTRY_AUTO(CStep2App, AsdkStep2, _selectEntity, selectEntity, ACRX_CMD_TRANSPARENT, NULL);
 ACED_ARXCOMMAND_ENTRY_AUTO(CStep2App, AsdkStep2, _requestText, requestText, ACRX_CMD_TRANSPARENT, NULL);
 //ACED_ARXCOMMAND_ENTRY_AUTO(CStep2App, AsdkStep2, _createDMG, createDMG, ACRX_CMD_TRANSPARENT, NULL);
 //ACED_ARXCOMMAND_ENTRY_AUTO(CStep2App, AsdkStep2, _readDMG, readDMG, ACRX_CMD_TRANSPARENT, NULL);
+
+

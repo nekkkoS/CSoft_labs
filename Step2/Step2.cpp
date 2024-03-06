@@ -20,7 +20,7 @@
 //
 
 //-----------------------------------------------------------------------------
-//- Step1.cpp : Initialization functions
+//- Step2.cpp : Initialization functions
 //-----------------------------------------------------------------------------
 #include "StdAfx.h"
 #include "resource.h"

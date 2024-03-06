@@ -25,7 +25,7 @@
 //-      but are changed infrequently
 //-----------------------------------------------------------------------------
 #pragma once
-#define STEP1_MODULE
+#define STEP2_MODULE
 
 /*#ifndef
 #define _ALLOW_RTCc_IN_STL

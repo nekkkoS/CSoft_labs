@@ -1,4 +1,4 @@
-Функции:
+Functions:
 requestPoint
 requestAngle
 selectEntity
