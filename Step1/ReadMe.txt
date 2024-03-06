@@ -1,2 +1,2 @@
-Функции:
+Functions:
 HelloWorld
