@@ -41,10 +41,6 @@ public:
 	static void AdskStep1_HelloWorld () {
 		acutPrintf(_T("\nHello, World!"));
 	}
-
-	static void HelloWorld() {
-		acutPrintf(_T("\nHello, World!"));
-	}
 } ;
 
 //-----------------------------------------------------------------------------
