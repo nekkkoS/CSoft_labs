@@ -296,7 +296,7 @@ public:
 	//	pCir2->close();
 	//	pDb->saveAs(_T("h:\\gitCSoft\\CSoft_labs\\test.dwg"));
 	//	delete pDb;
-	//	// А в какой момент уничтожаются pCir1 и pCir2?
+	//	// In which moment happens destroing pCir1 and pCir2?
 	//}
 
 	//static void AsdkStep2_createDMG() {
@@ -325,7 +325,7 @@ public:
 	//	AcDbBlockTableRecord* pBtblRcd;
 	//	pBtbl->getAt(ACDB_MODEL_SPACE, pBtblRcd, AcDb::kForWrite);
 	//	pBtbl->close();
-	//	// А как? и стоит ли на уммный указатель перевести?
+	//	// How to switch it to smart pointer? and worth it?
 	//	AcDbBlockTableRecordIterator* pBlkTblRcdItr;
 	//	pBtblRcd->newIterator(pBlkTblRcdItr);
 	//	AcDbEntity* pEnt;
