@@ -42,12 +42,18 @@ public:
 		if (acedGetPoint(NULL, _T("Select a point: "), point) == RTNORM) {
 			acutPrintf(_T("\nSelected point: (%.2f, %.2f, %.2f)"), point[0], point[1], point[2]);
 		}
+		else {
+			acutPrintf(_T("\nError selecting point"));
+		}
 	}
 
 	static void AsdkStep2_requestAngle() {
 		double angle;
 		if (acedGetAngle(NULL, _T("Enter an angle: "), &angle) == RTNORM) {
 			acutPrintf(_T("\nEntered angle: %.2f degrees"), angle);
+		}
+		else {
+			acutPrintf(_T("\nError selecting angle"));
 		}
 	}
 
@@ -57,8 +63,10 @@ public:
 
 		int result = acedEntSel(_T("\nSelect entity"), entity, point);
 
-		if (result != RTNORM)
+		if (result != RTNORM) {
+			acutPrintf(_T("\nError selecting entity"));
 			return;
+		}
 
 		acutPrintf(_T("\nYou selected entity ID: %ld, %ld"), entity[0]);
 	}
@@ -67,6 +75,9 @@ public:
 		TCHAR text[512];
 		if (acedGetString(0, _T("\nEnter some text: "), text) == RTNORM) {
 			acutPrintf(_T("\nEntered text: %s"), text);
+		}
+		else {
+			acutPrintf(_T("\nError entering text"));
 		}
 	}
 
