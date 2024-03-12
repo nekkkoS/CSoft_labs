@@ -87,15 +87,15 @@ public:
 
 	static void AsdkStep3_createNewLayer() {
 		try {
+
 			AcDbLayerTablePointer pLayerTable(acdbCurDwg(), AcDb::kForWrite);
 
-			//TODO: непонято как перевести pLayerTableRecord на умный указатель
-			AcDbLayerTableRecord* pLayerTableRecord =
-				new AcDbLayerTableRecord;
+			AcDbLayerTableRecordPointer pLayerTableRecord;
+			pLayerTableRecord.create();
+
 			pLayerTableRecord->setName(L"NEW_LAYER");
 
 			pLayerTable->add(pLayerTableRecord);
-			pLayerTableRecord->close();
 		}
 		catch (const Acad::ErrorStatus& e) {
 			acutPrintf(L"\nError code: %s\n", e);
@@ -131,7 +131,9 @@ public:
 		try {
 			AcDbLayerTablePointer pLayerTbl(acdbCurDwg(), AcDb::kForWrite);
 			if (!pLayerTbl->has(L"TESTLAYER")) {
-				AcDbLayerTableRecord* pLayerTblRcd = new AcDbLayerTableRecord;
+				AcDbLayerTableRecordPointer pLayerTblRcd;
+				pLayerTblRcd.create();
+
 				pLayerTblRcd->setName(L"TESTLAYER");
 				pLayerTblRcd->setIsFrozen(0);// layer to THAWED
 				pLayerTblRcd->setIsOff(0);   // layer to ON
@@ -151,7 +153,6 @@ public:
 				}
 				pLayerTblRcd->setLinetypeObjectId(ltId);
 				pLayerTbl->add(pLayerTblRcd);
-				pLayerTblRcd->close();
 			}
 			else {
 				acutPrintf(L"\nsuch layer already exists");
