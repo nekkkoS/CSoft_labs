@@ -56,7 +56,7 @@ public:
 			acutPrintf(L"\nLine created successfully");
 		}
 		catch (const Acad::ErrorStatus& e) {
-			acutPrintf(L"\nError code: %s\n", e);
+			acutPrintf(L"\nError code: %e\n", e);
 		}
 	}
 
@@ -81,7 +81,7 @@ public:
 			acutPrintf(L"\nCircle created successfully");
 		}
 		catch (const Acad::ErrorStatus& e) {
-			acutPrintf(L"\nError code: %s\n", e);
+			acutPrintf(L"\nError code: %e\n", e);
 		}
 	}
 
@@ -98,7 +98,7 @@ public:
 			pLayerTable->add(pLayerTableRecord);
 		}
 		catch (const Acad::ErrorStatus& e) {
-			acutPrintf(L"\nError code: %s\n", e);
+			acutPrintf(L"\nError code: %e\n", e);
 		}
 	}
 
@@ -123,7 +123,7 @@ public:
 			acutPrintf(L"\nBlock made successfully");
 		}
 		catch (const Acad::ErrorStatus& e) {
-			acutPrintf(L"\nError code: %s\n", e);
+			acutPrintf(L"\nError code: %e\n", e);
 		}
 	}
 
@@ -159,7 +159,7 @@ public:
 			}
 		}
 		catch (const Acad::ErrorStatus& e) {
-			acutPrintf(L"\nError code: %s\n", e);
+			acutPrintf(L"\nError code: %e\n", e);
 		}
 	}
 
