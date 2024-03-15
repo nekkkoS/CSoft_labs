@@ -1,3 +1,6 @@
 ﻿Функции:
 createDict
 removeDict
+add_Record_To_Dict
+remove_Record_From_Dict
+get_All_Records_From_Dict
