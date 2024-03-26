@@ -9,6 +9,7 @@
 //-----------------------------------------------------------------------------
 #include "dbmain.h"
 #include <tchar.h>
+#include <unordered_set>
 
 //-----------------------------------------------------------------------------
 class DLLIMPEXP CStar : public AcDbEntity {
@@ -36,14 +37,15 @@ public:
 	//- Graphics protocol
 
 	// ----
+	//Acad::ErrorStatus SetCenter(const AcGePoint3d p3dCenter);
 	Acad::ErrorStatus SetCenter(const AcGePoint3d p3dCenter);
-	Acad::ErrorStatus GetCenter(AcGePoint3d& p3dCenter);
+	Acad::ErrorStatus GetCenter(AcGePoint3d& p3dCenter) const;
 	Acad::ErrorStatus SetID(const Adesk::Int32 nID);
-	Acad::ErrorStatus GetID(Adesk::Int32& nID);
+	Acad::ErrorStatus GetID(Adesk::Int32& nID) const;
 	Acad::ErrorStatus SetNumberVertices(const Adesk::Int32 nNumberVertices);
-	Acad::ErrorStatus GetNumberVertices(Adesk::Int32& nNumberVertices);
+	Acad::ErrorStatus GetNumberVertices(Adesk::Int32& nNumberVertices) const;
 	Acad::ErrorStatus SetColor(const TCHAR* sColor);
-	Acad::ErrorStatus GetColor(TCHAR*& sColor);
+	Acad::ErrorStatus GetColor(TCHAR*& sColor) const;
 
 protected:
 	virtual Adesk::Boolean subWorldDraw (AcGiWorldDraw *mode) ;

@@ -70,7 +70,6 @@ Acad::ErrorStatus CStar::dwgInFields (AcDbDwgFiler *pFiler) {
 	//if ( version < CStar::kCurrentVersionNumber )
 	//	return (Acad::eMakeMeProxy) ;
 	//----- Read params
-	//.....
 	try {
 		switch (version) {
 		case 1:
@@ -101,8 +100,6 @@ Acad::ErrorStatus CStar::dxfOutFields (AcDbDxfFiler *pFiler) const {
 	if ( (es =pFiler->writeUInt32 (kDxfInt32, CStar::kCurrentVersionNumber)) != Acad::eOk )
 		return (es) ;
 	//----- Output params
-	//.....
-
 	try {
 		// Write out the data members
 		pFiler->writeItem(AcDb::kDxfInt32, m_nID);
@@ -195,29 +192,38 @@ Adesk::Boolean CStar::subWorldDraw (AcGiWorldDraw *mode) {
 	// Добавляем первую точку в конец массива, чтобы замкнуть фигуру
 	points.append(points.first());
 
-	// Рисуем звезду, соединяя точки полилинией
-	mode->geometry().polyline(points.length(), points.asArrayPtr());
+	try {
+		// Рисуем звезду, соединяя точки полилинией
+		mode->geometry().polyline(points.length(), points.asArrayPtr());
+	}
+	catch (const Acad::ErrorStatus& e) {
+		acutPrintf(L"\nError in CStar::subWorldDraw with drawing star: %e\n", e);
+	}
 
 	// Текстовая информация о звезде
 	// Определение положения для текста
-	AcGePoint3d textPosition = m_p3dCenter + AcGeVector3d(20.0, -radius - 20.0, 0.0); // Смещаем текст вправо от центра
+	try {
+		AcGePoint3d textPosition = m_p3dCenter + AcGeVector3d(20.0, -radius - 20.0, 0.0); // Смещаем текст вправо от центра
 
-	// Текстовая информация о звезде
-	TCHAR buffer[256];
-	_stprintf(buffer, _T("Vertices: %d"), m_nNumberVertices);
-	mode->geometry().text(textPosition, AcGeVector3d(0, 0, 1), AcGeVector3d(1, 0, 0), 10.0, 1.0, 0.0, buffer);
+		TCHAR buffer[256];
+		_stprintf(buffer, _T("Vertices: %d"), m_nNumberVertices);
+		mode->geometry().text(textPosition, AcGeVector3d(0, 0, 1), AcGeVector3d(1, 0, 0), 10.0, 1.0, 0.0, buffer);
 
-	textPosition.y -= 15.0; // Смещение вниз для следующей строки
-	_stprintf(buffer, _T("ID: %d"), m_nID);
-	mode->geometry().text(textPosition, AcGeVector3d(0, 0, 1), AcGeVector3d(1, 0, 0), 10.0, 1.0, 0.0, buffer);
+		textPosition.y -= 15.0; // Смещение вниз для следующей строки
+		_stprintf(buffer, _T("ID: %d"), m_nID);
+		mode->geometry().text(textPosition, AcGeVector3d(0, 0, 1), AcGeVector3d(1, 0, 0), 10.0, 1.0, 0.0, buffer);
 
-	textPosition.y -= 15.0;
-	_stprintf(buffer, _T("Center: (%.2f, %.2f, %.2f)"), m_p3dCenter.x, m_p3dCenter.y, m_p3dCenter.z);
-	mode->geometry().text(textPosition, AcGeVector3d(0, 0, 1), AcGeVector3d(1, 0, 0), 10.0, 1.0, 0.0, buffer);
+		textPosition.y -= 15.0;
+		_stprintf(buffer, _T("Center: (%.2f, %.2f, %.2f)"), m_p3dCenter.x, m_p3dCenter.y, m_p3dCenter.z);
+		mode->geometry().text(textPosition, AcGeVector3d(0, 0, 1), AcGeVector3d(1, 0, 0), 10.0, 1.0, 0.0, buffer);
 
-	textPosition.y -= 15.0;
-	_stprintf(buffer, _T("Color: %s"), m_sColor);
-	mode->geometry().text(textPosition, AcGeVector3d(0, 0, 1), AcGeVector3d(1, 0, 0), 10.0, 1.0, 0.0, buffer);
+		textPosition.y -= 15.0;
+		_stprintf(buffer, _T("Color: %s"), m_sColor);
+		mode->geometry().text(textPosition, AcGeVector3d(0, 0, 1), AcGeVector3d(1, 0, 0), 10.0, 1.0, 0.0, buffer);
+	}
+	catch (const Acad::ErrorStatus& e) {
+		acutPrintf(L"\nError in CStar::subWorldDraw with drawing text information: %e\n", e);
+	}
 
 	return Adesk::kTrue;
 }
@@ -226,15 +232,21 @@ Adesk::Boolean CStar::subWorldDraw (AcGiWorldDraw *mode) {
 Adesk::UInt32 CStar::subSetAttributes (AcGiDrawableTraits *traits) {
 	assertReadEnabled () ;
 	AcDbEntity::subSetAttributes(traits);
-	if (_tcscmp(m_sColor, _T("Red")) == 0) {
-		traits->setColor(1);
+	try {
+		if (_tcscmp(m_sColor, _T("red")) == 0) {
+			traits->setColor(1);
+		}
+		else if (_tcscmp(m_sColor, _T("green")) == 0) {
+			traits->setColor(3);
+		}
+		else if (_tcscmp(m_sColor, _T("blue")) == 0) {
+			traits->setColor(4);
+		}
 	}
-	else if (_tcscmp(m_sColor, _T("Green")) == 0) {
-		traits->setColor(3);
+	catch (const Acad::ErrorStatus& e) {
+		acutPrintf(L"\nError in CStar::subSetAttributes with set color: %e\n", e);
 	}
-	else if (_tcscmp(m_sColor, _T("Blue")) == 0) {
-		traits->setColor(4);
-	}
+
 	return Adesk::kTrue;
 }
 
@@ -246,7 +258,7 @@ Acad::ErrorStatus CStar::SetCenter(const AcGePoint3d p3dCenter)
 	return Acad::eOk;
 }
 
-Acad::ErrorStatus CStar::GetCenter(AcGePoint3d& p3dCenter)
+Acad::ErrorStatus CStar::GetCenter(AcGePoint3d& p3dCenter) const
 {
 	assertReadEnabled();
 	p3dCenter = m_p3dCenter;
@@ -262,7 +274,7 @@ Acad::ErrorStatus CStar::SetID(const Adesk::Int32 nID)
 	return Acad::eOk;;
 }
 
-Acad::ErrorStatus CStar::GetID(Adesk::Int32& nID)
+Acad::ErrorStatus CStar::GetID(Adesk::Int32& nID) const
 {
 	assertReadEnabled();
 	nID = m_nID;
@@ -278,7 +290,7 @@ Acad::ErrorStatus CStar::SetNumberVertices(const Adesk::Int32 nNumberVertices)
 	return Acad::eOk;
 }
 
-Acad::ErrorStatus CStar::GetNumberVertices(Adesk::Int32& nNumberVertices)
+Acad::ErrorStatus CStar::GetNumberVertices(Adesk::Int32& nNumberVertices) const
 {
 	assertReadEnabled();
 	nNumberVertices = m_nNumberVertices;
@@ -297,7 +309,7 @@ Acad::ErrorStatus CStar::SetColor(const TCHAR* sColor)
 	return Acad::eOk;
 }
 
-Acad::ErrorStatus CStar::GetColor(TCHAR*& sColor)
+Acad::ErrorStatus CStar::GetColor(TCHAR*& sColor) const
 {
 	assertReadEnabled();
 	sColor = m_sColor;
