@@ -42,7 +42,7 @@ bool DbStarReactor::IsAttached () const {
 
 void DbStarReactor::objectAppended(const AcDbDatabase* dwg, const AcDbObject* dbObj)
 {
-	// TODO: не понял как перевести это на smart pointer
+	// TODO: непонято как перевести это на smart pointer
 	//std::unique_ptr<AcDbBlockReference> pInsert = std::make_unique<AcDbBlockReference>();
 	//AcDbObjectPointer<AcDbBlockReference> pInsert;
 	AcDbBlockReference* pInsert = AcDbBlockReference::cast(dbObj);

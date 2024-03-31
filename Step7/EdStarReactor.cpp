@@ -1,5 +1,6 @@
 ﻿#include "StdAfx.h"
 #include "EdStarReactor.h"
+# define M_PI 3.14159265358979323846  /* pi */
 
 //-----------------------------------------------------------------------------
 EdStarReactor::EdStarReactor(const bool autoInitAndRelease) : AcEditorReactor(), mbAutoInitAndRelease(autoInitAndRelease) {
@@ -65,19 +66,16 @@ void EdStarReactor::commandWillStart(const ACHAR* cmdStr) {
 	}
 }
 
-void EdStarReactor::commandEnded(const ACHAR* cmdStr)
-{
-	// Was one of our monitored commands active
-	if (DocVars.docData().m_bEditCommand == false)
+void EdStarReactor::commandEnded(const ACHAR* cmdStr) {
+	// Проверка активности отслеживаемой команды
+	if (!DocVars.docData().m_bEditCommand)
 		return;
 
 	DocVars.docData().m_bEditCommand = false;
-
-	// disable the object reactor
-	// (so the object reactor knows that we are changing the object)
+	// Отключение реактора объекта
 	DocVars.docData().m_bDoRepositioning = true;
 
-	// Reset to previous position
+	// Смещение и поворот каждого измененного объекта
 	for (int i = 0; i < DocVars.docData().m_aIdChangedObjects.length(); ++i) {
 		AcDbObjectPointer<AcDbBlockReference> pInsert(DocVars.docData().m_aIdChangedObjects.at(i), AcDb::kForWrite);
 		if (pInsert.openStatus() != Acad::eOk) {
@@ -85,13 +83,18 @@ void EdStarReactor::commandEnded(const ACHAR* cmdStr)
 			return;
 		}
 
-		AcGePoint3d p3dNewPos = pInsert->position();
-		AcGePoint3d p3d_OldPos = DocVars.docData().m_aPt3dStarPositions.at(i);
-		// Resetting the position to the original one
-		if (p3dNewPos != p3d_OldPos) {
-			pInsert->setPosition(p3d_OldPos);
-			acutPrintf(_T("\nBlock has been reset to its original location."));
-		}
+		// Смещение вправо на 500 единиц
+		AcGeVector3d vecDeltaRight(500.0, 0.0, 0.0);
+		AcGePoint3d p3dNewPos = pInsert->position() + vecDeltaRight;
+		pInsert->setPosition(p3dNewPos);
+
+		// Получение текущего угла поворота и добавление 90 градусов (в радианах)
+		double dCurrentRotation = pInsert->rotation();
+		// Поворот на 90 градусов (pi/2 радиан)
+		double dNewRotation = dCurrentRotation + (M_PI / 2);
+		pInsert->setRotation(dNewRotation);
+
+		acutPrintf(_T("\nBlock has been moved right by 500 units and rotated 90 degrees."));
 	}
 	acutPrintf(_T("\nCommand end"));
 }

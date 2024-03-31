@@ -22,7 +22,7 @@ void ObjStarReactor::openedForModify(const AcDbObject* dbObj)
 	if (!DocVars.docData().m_bEditCommand)
 		return;
 
-	// TODO: не понял как перевести это на smart pointer
+	// TODO: непонято как перевести это на smart pointer
 	AcDbBlockReference* pInsert = AcDbBlockReference::cast(dbObj);
 	if (!pInsert)
 		return;
