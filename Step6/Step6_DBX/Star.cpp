@@ -207,25 +207,18 @@ void CStar::DrawStar(AcGiWorldDraw* mode)
 	const double dInnerRadius = m_dRadius / nCoeffTwo;
 	const double dAngle = nCoeffTwo * M_PI / m_nNumberVertices; // Угловой шаг между основными вершинами
 
-	AcGePoint3dArray points;
+	AcGePoint3dArray arr3dPoints {};
 	// TODO: нужно ли здесь использовать геттер или и так норм?
-	AcGeVector3d centerOffset = AcGeVector3d(m_p3dCenter.x, m_p3dCenter.y, m_p3dCenter.z);
+	AcGeVector3d vec3dCenterOffset = AcGeVector3d(m_p3dCenter.x, m_p3dCenter.y, m_p3dCenter.z);
 
-	for (int nPoint = 0; nPoint < nPoints; ++nPoint) {
-		double r = nPoint % 2 == 0 ? m_dRadius : dInnerRadius; // Используем больший или меньший радиус
-		double theta = nPoint * dAngle / nCoeffTwo; // Угол для каждой точки
-		double x = cos(theta) * r;
-		double y = sin(theta) * r;
-		// Добавляем смещение к каждой точке
-		points.append(AcGePoint3d(x, y, 0.0) + centerOffset);
-	}
+	CalculateVerticesCoordinates(nPoints, dInnerRadius, dAngle, nCoeffTwo, vec3dCenterOffset, arr3dPoints);
 
 	// Добавляем первую точку в конец массива, чтобы замкнуть фигуру
-	points.append(points.first());
+	arr3dPoints.append(arr3dPoints.first());
 
 	try {
 		// Рисуем звезду, соединяя точки полилинией
-		mode->geometry().polyline(points.length(), points.asArrayPtr());
+		mode->geometry().polyline(arr3dPoints.length(), arr3dPoints.asArrayPtr());
 	}
 	catch (const Acad::ErrorStatus& e) {
 		acutPrintf(L"\nError in CStar::DrawStar with drawing star: %e\n", e);
@@ -257,6 +250,18 @@ void CStar::DrawTextInfo(AcGiWorldDraw* mode)
 	}
 	catch (const Acad::ErrorStatus& e) {
 		acutPrintf(L"\nError in CStar::DrawTextInfo with drawing text information: %e\n", e);
+	}
+}
+
+void CStar::CalculateVerticesCoordinates(int nPoints, double dInnerRadius, double dAngle, int nCoeffTwo, AcGeVector3d vec3dCenterOffset, AcGePoint3dArray& arr3dPoints)
+{
+	for (int nPoint = 0; nPoint < nPoints; ++nPoint) {
+		double r = nPoint % 2 == 0 ? m_dRadius : dInnerRadius; // Используем больший или меньший радиус
+		double theta = nPoint * dAngle / nCoeffTwo; // Угол для каждой точки
+		double x = cos(theta) * r;
+		double y = sin(theta) * r;
+		// Добавляем смещение к каждой точке
+		arr3dPoints.append(AcGePoint3d(x, y, 0.0) + vec3dCenterOffset);
 	}
 }
 

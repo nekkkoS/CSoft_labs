@@ -53,8 +53,9 @@ protected:
 
 	void DrawStar(AcGiWorldDraw* mode);
 	void DrawTextInfo(AcGiWorldDraw* mode);
+	void CalculateVerticesCoordinates(int nPoints, double dInnerRadius, double dAngle, int nCoeffTwo, AcGeVector3d vec3dCenterOffset, AcGePoint3dArray& arr3dPoints);
 
-	AcGePoint3d m_p3dCenter;
+	AcGePoint3d m_p3dCenter{};
 	Adesk::Int32 m_nID{};
 	Adesk::Int32 m_nNumberVertices{};
 	TCHAR* m_sColor{};
