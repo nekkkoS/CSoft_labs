@@ -171,18 +171,19 @@ Acad::ErrorStatus CStar::dxfInFields (AcDbDxfFiler *pFiler) {
 Adesk::Boolean CStar::subWorldDraw (AcGiWorldDraw *mode) {
 	assertReadEnabled () ;
 	// Параметры звезды
-	const int nPoints = m_nNumberVertices * 2;
+	const int nCoeffTwo = 2;
+	const int nPoints = m_nNumberVertices * nCoeffTwo;
 	double radius = 100.0;
-	double innerRadius = radius / 2;
-	double angle = 2 * M_PI / m_nNumberVertices; // Угловой шаг между основными вершинами
+	double innerRadius = radius / nCoeffTwo;
+	double angle = nCoeffTwo * M_PI / m_nNumberVertices; // Угловой шаг между основными вершинами
 
 	AcGePoint3dArray points;
 	// TODO: нужно ли здесь использовать геттер или и так норм?
 	AcGeVector3d centerOffset = AcGeVector3d(m_p3dCenter.x, m_p3dCenter.y, m_p3dCenter.z);
 
-	for (int i = 0; i < nPoints; ++i) {
-		double r = i % 2 == 0 ? radius : innerRadius; // Используем больший или меньший радиус
-		double theta = i * angle / 2; // Угол для каждой точки
+	for (int nPoint = 0; nPoint < nPoints; ++nPoint) {
+		double r = nPoint % 2 == 0 ? radius : innerRadius; // Используем больший или меньший радиус
+		double theta = nPoint * angle / nCoeffTwo; // Угол для каждой точки
 		double x = cos(theta) * r;
 		double y = sin(theta) * r;
 		// Добавляем смещение к каждой точке
