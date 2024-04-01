@@ -51,10 +51,14 @@ protected:
 	virtual Adesk::Boolean subWorldDraw (AcGiWorldDraw *mode) ;
 	virtual Adesk::UInt32 subSetAttributes (AcGiDrawableTraits *traits) ;
 
+	void DrawStar(AcGiWorldDraw* mode);
+	void DrawTextInfo(AcGiWorldDraw* mode);
+
 	AcGePoint3d m_p3dCenter;
 	Adesk::Int32 m_nID{};
 	Adesk::Int32 m_nNumberVertices{};
 	TCHAR* m_sColor{};
+	const double m_dRadius = 100;
 } ;
 
 #ifdef STEP6_DBX_MODULE

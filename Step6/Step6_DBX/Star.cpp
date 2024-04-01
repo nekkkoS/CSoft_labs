@@ -170,62 +170,10 @@ Acad::ErrorStatus CStar::dxfInFields (AcDbDxfFiler *pFiler) {
 //----- AcDbEntity protocols
 Adesk::Boolean CStar::subWorldDraw (AcGiWorldDraw *mode) {
 	assertReadEnabled () ;
-	// Параметры звезды
-	const int nCoeffTwo = 2;
-	const int nPoints = m_nNumberVertices * nCoeffTwo;
-	double radius = 100.0;
-	double innerRadius = radius / nCoeffTwo;
-	double angle = nCoeffTwo * M_PI / m_nNumberVertices; // Угловой шаг между основными вершинами
 
-	AcGePoint3dArray points;
-	// TODO: нужно ли здесь использовать геттер или и так норм?
-	AcGeVector3d centerOffset = AcGeVector3d(m_p3dCenter.x, m_p3dCenter.y, m_p3dCenter.z);
-
-	for (int nPoint = 0; nPoint < nPoints; ++nPoint) {
-		double r = nPoint % 2 == 0 ? radius : innerRadius; // Используем больший или меньший радиус
-		double theta = nPoint * angle / nCoeffTwo; // Угол для каждой точки
-		double x = cos(theta) * r;
-		double y = sin(theta) * r;
-		// Добавляем смещение к каждой точке
-		points.append(AcGePoint3d(x, y, 0.0) + centerOffset);
-	}
-
-	// Добавляем первую точку в конец массива, чтобы замкнуть фигуру
-	points.append(points.first());
-
-	try {
-		// Рисуем звезду, соединяя точки полилинией
-		mode->geometry().polyline(points.length(), points.asArrayPtr());
-	}
-	catch (const Acad::ErrorStatus& e) {
-		acutPrintf(L"\nError in CStar::subWorldDraw with drawing star: %e\n", e);
-	}
-
-	// Текстовая информация о звезде
-	// Определение положения для текста
-	try {
-		AcGePoint3d textPosition = m_p3dCenter + AcGeVector3d(20.0, -radius - 20.0, 0.0); // Смещаем текст вправо от центра
-
-		TCHAR buffer[256];
-		_stprintf(buffer, _T("Vertices: %d"), m_nNumberVertices);
-		mode->geometry().text(textPosition, AcGeVector3d(0, 0, 1), AcGeVector3d(1, 0, 0), 10.0, 1.0, 0.0, buffer);
-
-		textPosition.y -= 15.0; // Смещение вниз для следующей строки
-		_stprintf(buffer, _T("ID: %d"), m_nID);
-		mode->geometry().text(textPosition, AcGeVector3d(0, 0, 1), AcGeVector3d(1, 0, 0), 10.0, 1.0, 0.0, buffer);
-
-		textPosition.y -= 15.0;
-		_stprintf(buffer, _T("Center: (%.2f, %.2f, %.2f)"), m_p3dCenter.x, m_p3dCenter.y, m_p3dCenter.z);
-		mode->geometry().text(textPosition, AcGeVector3d(0, 0, 1), AcGeVector3d(1, 0, 0), 10.0, 1.0, 0.0, buffer);
-
-		textPosition.y -= 15.0;
-		_stprintf(buffer, _T("Color: %s"), m_sColor);
-		mode->geometry().text(textPosition, AcGeVector3d(0, 0, 1), AcGeVector3d(1, 0, 0), 10.0, 1.0, 0.0, buffer);
-	}
-	catch (const Acad::ErrorStatus& e) {
-		acutPrintf(L"\nError in CStar::subWorldDraw with drawing text information: %e\n", e);
-	}
-
+	DrawStar(mode);
+	DrawTextInfo(mode);
+	
 	return Adesk::kTrue;
 }
 
@@ -249,6 +197,67 @@ Adesk::UInt32 CStar::subSetAttributes (AcGiDrawableTraits *traits) {
 	}
 
 	return Adesk::kTrue;
+}
+
+void CStar::DrawStar(AcGiWorldDraw* mode)
+{
+	// Параметры звезды
+	const int nCoeffTwo = 2;
+	const int nPoints = m_nNumberVertices * nCoeffTwo;
+	const double dInnerRadius = m_dRadius / nCoeffTwo;
+	const double dAngle = nCoeffTwo * M_PI / m_nNumberVertices; // Угловой шаг между основными вершинами
+
+	AcGePoint3dArray points;
+	// TODO: нужно ли здесь использовать геттер или и так норм?
+	AcGeVector3d centerOffset = AcGeVector3d(m_p3dCenter.x, m_p3dCenter.y, m_p3dCenter.z);
+
+	for (int nPoint = 0; nPoint < nPoints; ++nPoint) {
+		double r = nPoint % 2 == 0 ? m_dRadius : dInnerRadius; // Используем больший или меньший радиус
+		double theta = nPoint * dAngle / nCoeffTwo; // Угол для каждой точки
+		double x = cos(theta) * r;
+		double y = sin(theta) * r;
+		// Добавляем смещение к каждой точке
+		points.append(AcGePoint3d(x, y, 0.0) + centerOffset);
+	}
+
+	// Добавляем первую точку в конец массива, чтобы замкнуть фигуру
+	points.append(points.first());
+
+	try {
+		// Рисуем звезду, соединяя точки полилинией
+		mode->geometry().polyline(points.length(), points.asArrayPtr());
+	}
+	catch (const Acad::ErrorStatus& e) {
+		acutPrintf(L"\nError in CStar::DrawStar with drawing star: %e\n", e);
+	}
+}
+
+void CStar::DrawTextInfo(AcGiWorldDraw* mode)
+{
+	// Текстовая информация о звезде
+	// Определение положения для текста;
+	try {
+		AcGePoint3d p3dTextPosition = m_p3dCenter + AcGeVector3d(20.0, -m_dRadius - 20.0, 0.0); // Смещаем текст вправо от центра
+
+		TCHAR sBuffer[256];
+		_stprintf(sBuffer, _T("Vertices: %d"), m_nNumberVertices);
+		mode->geometry().text(p3dTextPosition, AcGeVector3d(0, 0, 1), AcGeVector3d(1, 0, 0), 10.0, 1.0, 0.0, sBuffer);
+
+		p3dTextPosition.y -= 15.0; // Смещение вниз для следующей строки
+		_stprintf(sBuffer, _T("ID: %d"), m_nID);
+		mode->geometry().text(p3dTextPosition, AcGeVector3d(0, 0, 1), AcGeVector3d(1, 0, 0), 10.0, 1.0, 0.0, sBuffer);
+
+		p3dTextPosition.y -= 15.0;
+		_stprintf(sBuffer, _T("Center: (%.2f, %.2f, %.2f)"), m_p3dCenter.x, m_p3dCenter.y, m_p3dCenter.z);
+		mode->geometry().text(p3dTextPosition, AcGeVector3d(0, 0, 1), AcGeVector3d(1, 0, 0), 10.0, 1.0, 0.0, sBuffer);
+
+		p3dTextPosition.y -= 15.0;
+		_stprintf(sBuffer, _T("Color: %s"), m_sColor);
+		mode->geometry().text(p3dTextPosition, AcGeVector3d(0, 0, 1), AcGeVector3d(1, 0, 0), 10.0, 1.0, 0.0, sBuffer);
+	}
+	catch (const Acad::ErrorStatus& e) {
+		acutPrintf(L"\nError in CStar::DrawTextInfo with drawing text information: %e\n", e);
+	}
 }
 
 Acad::ErrorStatus CStar::SetCenter(const AcGePoint3d p3dCenter)
