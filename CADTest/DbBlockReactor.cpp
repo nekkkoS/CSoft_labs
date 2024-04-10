@@ -39,12 +39,9 @@ bool DbBlockReactor::IsAttached () const {
 	return (mpDatabase != NULL) ;
 }
 
-// TODO: отрефакторить
-void DbBlockReactor::objectAppended(const AcDbDatabase* dwg, const AcDbObject* dbObj)
-{
+void DbBlockReactor::objectAppended(const AcDbDatabase* dwg, const AcDbObject* dbObj) {
 	AcDbBlockReference* pInsert = AcDbBlockReference::cast(dbObj);
-	if (!pInsert)
-		return;
+	if (!pInsert) return;
 
 	AcDbObjectId blockId = pInsert->blockTableRecord();
 	AcDbObjectPointer<AcDbBlockTableRecord> pBlockTableRecord(blockId, AcDb::kForRead);
@@ -53,14 +50,10 @@ void DbBlockReactor::objectAppended(const AcDbDatabase* dwg, const AcDbObject* d
 		return;
 	}
 
-	const TCHAR* sBlockName;
-	pBlockTableRecord->getName(sBlockName);
-	pBlockTableRecord->close();
-
-	if (_tcscmp(sBlockName, _T("CHAMOMILE")))
+	AcString sBlockName;
+	if (pBlockTableRecord->getName(sBlockName) != Acad::eOk || sBlockName != _T("CHAMOMILE")) {
 		return;
+	}
 
 	dbObj->addReactor(pChamomileBlockReactor);
-
-	acutPrintf(_T("\nNew object appended to the database!!!"));
 }

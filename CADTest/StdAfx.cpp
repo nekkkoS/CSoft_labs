@@ -1,97 +1,96 @@
 ﻿#include "StdAfx.h"
 
-// TODO: отрефакторить
-Acad::ErrorStatus attachChamomileReactorToAllChamomile(bool attach)
-{
-	// This function looks for all block references 
-	// of the block "employee" in Model Space.
-	// If the insert has not been attached our object reactor, we attach it.
-	Acad::ErrorStatus es;
+Acad::ErrorStatus attachChamomileReactorToAllChamomile(bool attach) {
+    Acad::ErrorStatus es;
 
-	// Get the block table of the current database
-	AcDbBlockTable* pBlockTable;
-	if ((es = acdbHostApplicationServices()->workingDatabase()->getBlockTable(pBlockTable, AcDb::kForRead)) != Acad::eOk)
-		return (es);
-	// Get Model Space for read.
-	AcDbBlockTableRecord* pModelSpace;
-	es = pBlockTable->getAt(ACDB_MODEL_SPACE, pModelSpace, AcDb::kForRead);
-	pBlockTable->close();
-	if (es != Acad::eOk)
-		return (es);
-	// Create an iterator
-	AcDbBlockTableRecordIterator* pIterator;
-	if ((es = pModelSpace->newIterator(pIterator)) != Acad::eOk) {
-		pModelSpace->close();
-		return (es);
-	}
-	// Go through the records
-	for (; !pIterator->done(); pIterator->step()) {
-		// The entity does not need to be open for write to
-		// add or remove a transient reactor
-		AcDbEntity* pEnt;
-		es = pIterator->getEntity(pEnt, AcDb::kForRead);
+    AcDbBlockTable* pBlockTable;
+    AcDbDatabase* pDb = acdbHostApplicationServices()->workingDatabase();
+    if ((es = pDb->getBlockTable(pBlockTable, AcDb::kForRead)) != Acad::eOk)
+        return es;
 
-		AcDbBlockReference* pInsert = AcDbBlockReference::cast(pEnt);
-		if (!pInsert) {
-			pEnt->close();
-			continue;
-		}
+    // Получаем запись "Model Space" для чтения
+    AcDbBlockTableRecord* pModelSpace;
+    if ((es = pBlockTable->getAt(ACDB_MODEL_SPACE, pModelSpace, AcDb::kForRead)) != Acad::eOk) {
+        pBlockTable->close();
+        return es;
+    }
+    pBlockTable->close();
 
-		// Get the ObjectId of the BlockTableRecord where the reference is defined
-		AcDbObjectId blockId = pInsert->blockTableRecord();
-		AcDbBlockTableRecord* pBlockTableRecord;
-		if (acdbOpenAcDbObject((AcDbObject*&)pBlockTableRecord, blockId, AcDb::kForRead) != Acad::eOk) {
-			acutPrintf(_T("\nCannot open block table record!"));
-			pEnt->close();
-			break;
-		}
+    AcDbBlockTableRecordIterator* pIterator;
+    if ((es = pModelSpace->newIterator(pIterator)) != Acad::eOk) {
+        pModelSpace->close();
+        return es;
+    }
 
-		const TCHAR* blockName;
-		pBlockTableRecord->getName(blockName);
-		pBlockTableRecord->close();
+    // Проходим по всем записям
+    for (; !pIterator->done(); pIterator->step()) {
+        AcDbEntity* pEnt;
+        if (pIterator->getEntity(pEnt, AcDb::kForWrite) != Acad::eOk)
+            continue;
 
-		if (_tcscmp(blockName, _T("CHAMOMILE"))) {
-			pEnt->close();
-			continue; // Not a chamomile
-		}
+        AcDbBlockReference* pInsert = AcDbBlockReference::cast(pEnt);
+        if (!pInsert) {
+            pEnt->close();
+            continue;
+        }
 
-		if (attach) {
-			pEnt->addReactor(pChamomileBlockReactor);
-		}
-		else {
-			pEnt->removeReactor(pChamomileBlockReactor);
-		}
-		pEnt->close();
-	}
-	delete pIterator;
-	pModelSpace->close();
-	return (Acad::eOk);
+        // Получаем ObjectId записи BlockTableRecord, где определена ссылка
+        AcDbObjectId blockId = pInsert->blockTableRecord();
+        AcDbBlockTableRecord* pBlockTableRecord;
+        if (acdbOpenAcDbObject((AcDbObject*&)pBlockTableRecord, blockId, AcDb::kForRead) != Acad::eOk) {
+            acutPrintf(_T("\nCannot open block table record!"));
+            pEnt->close();
+            break;
+        }
+
+        const TCHAR* blockName;
+        pBlockTableRecord->getName(blockName);
+        pBlockTableRecord->close();
+
+        if (_tcscmp(blockName, _T("CHAMOMILE")) != 0) {
+            pEnt->close();
+            continue;
+        }
+
+        if (attach)
+            pEnt->addReactor(pChamomileBlockReactor);
+        else
+            pEnt->removeReactor(pChamomileBlockReactor);
+
+        pEnt->close();
+    }
+
+    pModelSpace->close();
+    return Acad::eOk;
 }
 
-// TODO: отрефакторить
-void detachAllChamomileReactors()
-{
-	AcApDocumentIterator* pIterator = acDocManager->newAcApDocumentIterator();
-	if (pIterator == NULL)
-		return;
+void detachAllChamomileReactors() {
+    AcApDocumentIterator* pIterator = acDocManager->newAcApDocumentIterator();
+    if (pIterator == nullptr)
+        return;
 
-	AcApDocument* pOldDoc = acDocManager->curDocument();
+    AcApDocument* pOldDoc = acDocManager->curDocument(); // Сохраняем текущий документ
 
-	while (!pIterator->done()) {
-		AcApDocument* pDoc = pIterator->document();
-		if (pDoc->lockMode() == AcAp::kNone) {
-			if (acDocManager->setCurDocument(pDoc, AcAp::kAutoWrite, Adesk::kFalse) == Acad::eOk) {
-				attachChamomileReactorToAllChamomile(false);
-				acDocManager->unlockDocument(pDoc);
-			}
-		}
-		else {
-			acDocManager->setCurDocument(pDoc);
-			attachChamomileReactorToAllChamomile(false);
-		}
-		pIterator->step();
-	}
-	delete pIterator;
+    while (!pIterator->done()) {
+        AcApDocument* pDoc = pIterator->document();
+        // Если документ не заблокирован, устанавливаем его в режим записи
+        if (pDoc->lockMode() == AcAp::kNone) {
+            acDocManager->setCurDocument(pDoc, AcAp::kAutoWrite, Adesk::kFalse);
+        }
+        else {
+            // Если документ заблокирован, просто устанавливаем его как текущий
+            acDocManager->setCurDocument(pDoc);
+        }
 
-	acDocManager->setCurDocument(pOldDoc, AcAp::kNone, Adesk::kFalse);
+        attachChamomileReactorToAllChamomile(false);
+
+        // Если документ не заблокирован, разблокируем его
+        if (pDoc->lockMode() == AcAp::kNone) {
+            acDocManager->unlockDocument(pDoc);
+        }
+
+        pIterator->step();
+    }
+
+    acDocManager->setCurDocument(pOldDoc, AcAp::kNone, Adesk::kFalse); // Восстанавливаем текущий документ
 }

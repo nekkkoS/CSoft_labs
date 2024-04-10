@@ -44,27 +44,29 @@ public:
 	virtual void RegisterServerComponents() {
 	}
 
-    static void CADTest_CreateBlock() {
+    static void CADTest_MakeChamolineBlock() {
         int nNumberPetals{};
         if (acedGetInt(_T("Enter number petals: "), &nNumberPetals) != RTNORM) {
             acutPrintf(L"Error entering number petals");
             return;
         }
 
-        /*if (createBlockRecord(L"STAR", nNumberPetals) != Acad::eOk)
-            acutPrintf(_T("\nERROR: Couldn't create block record."));
-        else
-            acutPrintf(_T("\nBlock STAR successfully created."));*/
+        if (nNumberPetals < 2) {
+            acutPrintf(L"\nNumber petals must be > 1");
+            return;
+        }
 
         Acad::ErrorStatus es;
 
         AcDbBlockTablePointer pBlockTable(acdbCurDwg(), AcDb::kForRead);
         es = pBlockTable.openStatus();
         if (es != Acad::eOk) {
+            acutPrintf(L"\nError creating pBlockTable");
             return;
         }
 
         if (pBlockTable->has(L"CHAMOMILE") == Adesk::kTrue) {
+            acutPrintf(L"\nBlock with CHAMOMILE name already exists");
             return;
         }
 
@@ -72,17 +74,32 @@ public:
         pBlockTableRecord.create();
         pBlockTableRecord->setName(L"CHAMOMILE");
         pBlockTableRecord->setOrigin(AcGePoint3d::kOrigin);
+        
+        if (pBlockTableRecord.openStatus() != Acad::eOk) {
+            acutPrintf(L"\nError creating pBlockTableRecord");
+            return;
+        }
 
         if ((es = pBlockTable->upgradeOpen()) != Acad::eOk) {
+            acutPrintf(L"\nError executing upgradeOpen");
             return;
         }
 
         if ((es = pBlockTable->add(pBlockTableRecord)) != Acad::eOk) {
+            acutPrintf(L"\nError adding pBlockTableRecord to pBlockTable");
             return;
         }
 
-        ChamomileDrawer chamomile(pBlockTableRecord);
-        chamomile.drawChamomile(nNumberPetals);
+        try {
+            ChamomileDrawer chamomile(pBlockTableRecord);
+            chamomile.drawChamomile(nNumberPetals);
+        }
+        catch (const Acad::ErrorStatus& e) {
+            acutPrintf(L"\nError code: %e\n", e);
+        }
+        catch (...) {
+            acutPrintf(L"\nError drawing chamomile");
+        }
     }
 
 };
@@ -90,5 +107,5 @@ public:
 //-----------------------------------------------------------------------------
 IMPLEMENT_ARX_ENTRYPOINT(CCADTestApp)
 
-ACED_ARXCOMMAND_ENTRY_AUTO(CCADTestApp, CADTest, _CreateBlock, CREATE_BLOCK, ACRX_CMD_MODAL, NULL)
+ACED_ARXCOMMAND_ENTRY_AUTO(CCADTestApp, CADTest, _MakeChamolineBlock, MAKE_CHAMOLINE_BLOCK, ACRX_CMD_MODAL, NULL)
 
