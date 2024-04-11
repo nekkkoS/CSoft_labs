@@ -11,10 +11,5 @@ public:
 	CDocData (const CDocData &data) ;
 	~CDocData () ;
 
-	bool				m_bEditCommand;
-	bool				m_bDoRepositioning;
-	AcDbObjectIdArray	m_aIdChangedObjects;
-	AcGePoint3dArray	m_aPt3dChamomilePositions;
-
 	DbBlockReactor* m_pDbChamomileReactor;
 } ;
